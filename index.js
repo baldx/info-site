@@ -1,24 +1,26 @@
-const http = require('http');
-const fs = require('fs'); //imports
+const express = require('express');
+const app = express();
+const port = 3000;
+const path = require('path')
 
-const server = http.createServer((req, res) => { //creates a server
-    let filePath = '.' + req.url //stores the file path as a variable to know where to go
 
-    if (filePath === './') filePath = './index.html'; //if statements checking the url and setting the filepath to that file in the system (fs)
-    else if (filePath === './about') filePath = './about.html';
-    else if (filePath === './contact-me') filePath = './contact-me.html';
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '/index.html')); //__dirname is global variable in node.js, represents the directory name of the current module
+});
 
-    fs.readFile(filePath, (err, data) => { //reads filePath
-        if (err) { //if error
-            fs.readFile('./404.html', (err, data) => { //read the 404 html page
-                res.writeHead(404, { 'Content-Type': 'text/html'}) //define statuscode & type
-                res.end(data); // returns the data from the file in hex code and converts it, displaying on page
-            })
-        } else {
-            res.writeHead(200, { 'Content-Type': 'text/html'});
-            res.end(data)
-        }
-    })
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, '/about.html'));
+});
+
+app.get('/contact-me', (req, res) => {
+    res.sendFile(path.join(__dirname, '/contact-me.html'));
+});
+
+app.use((req, res) => { //app.use() is a middleware that is executed for every incoming request
+    res.status(404).sendFile(path.join(__dirname, '404.html'))//if status is 404, send to the error page
 })
 
-server.listen(8080); //makes it possible to visit http://localhost:8080/
+app.listen(port, () => {
+    console.log('it works');
+})
+
